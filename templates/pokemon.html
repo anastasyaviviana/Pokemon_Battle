@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Hasil</title>
+    <style>
+        input[type=submit] {
+                    background-color: #4CAF50;
+                    color: white;
+                    padding: 12px 20px;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    }
+
+        input[type=submit]:hover {
+            background-color: #45a049;
+            }
+
+    </style>
+</head>
+<body>
+    <h1>
+        <center>
+            {{nama1}}
+            <img src="{{gambar1}}" alt="{{gambar1}}" width='200'>
+            {{nama2}}
+            <img src="{{gambar2}}" alt="{{gambar2}}" width='200'>
+        </center>
+    </h1>
+   
+    <h2>
+        <center>
+            <h3>
+                <b>{{proba}}% {{winner}} Wins !</b>
+
+            </h3>
+
+        </center>
+    </h2>
+    <center>
+        <form action="http://localhost:5000/">
+            <p> 
+            <input type="submit" value="Kembali">
+            </p>
+        </form>
+    </center>
+</body>
+</html>
