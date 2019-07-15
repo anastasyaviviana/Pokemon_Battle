@@ -1,10 +1,11 @@
-from flask import redirect, request, Flask, render_template, url_for
+from flask import redirect, request, Flask, render_template, url_for,send_from_directory
 import json, requests
 import pandas as pd
 import joblib
+import os
 
 app=Flask(__name__)
-
+app.config['UPLOAD_FOLDER']='./storage'
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -19,8 +20,8 @@ def post():
     poke2=poke2.lower() #nama
 
     datapokemon=pd.read_csv('pokemon.csv')
-    idpoke1=(datapokemon[datapokemon['Name']==poke1.title()].index.values[0])+1
-    idpoke2=(datapokemon[datapokemon['Name']==poke2.title()].index.values[0])+1
+    idpoke1=datapokemon[datapokemon['Name']==poke1.title()]['#'].values[0]
+    idpoke2=datapokemon[datapokemon['Name']==poke2.title()]['#'].values[0]
 
     url1='https://pokeapi.co/api/v2/pokemon/'+poke1
     url2='https://pokeapi.co/api/v2/pokemon/'+poke2
@@ -60,52 +61,65 @@ def post():
     proba=model.predict_proba([[hp1,hp2,attack1,attack2,defense1,defense2,spatk1,spatk2,spdef1,spdef2,speed1,speed2]])
     probamax=round(proba[0,predict]*100)
     
-    # #predict langsung
-    # predict=model.predict(var_x)
-    # proba=model.predict_proba(var_x)
-    # # print(proba[0,1])
-    # dataproba=[]
-    # for i in range(len(df)):
-    #     if proba[i,0] < proba[i,1]:
-    #         dataproba.append(proba[i,1])
-    #     else:
-    #         dataproba.append(proba[i,0])
 
+    #plot 
 
+    dfhp=pd.DataFrame(dict(nama=[poke1,poke2],hp=[hp1,hp2]))
+    dfattack=pd.DataFrame(dict(nama=[poke1,poke2],attack=[attack1,attack2]))
+    dfdefense=pd.DataFrame(dict(nama=[poke1,poke2],defense=[defense1,defense2]))
+    dfspatk=pd.DataFrame(dict(nama=[poke1,poke2],spatk=[spatk1,spatk2]))
+    dfspdef=pd.DataFrame(dict(nama=[poke1,poke2],spdef=[spdef1,spdef2]))
+    dfspeed=pd.DataFrame(dict(nama=[poke1,poke2],speed=[speed1,speed2]))
 
+    import matplotlib.pyplot as plt
 
-
-
-
-    # datapredict=pd.read_csv('hasiltesting.csv')
-
-    # try:
-    #     if datapredict[datapredict['idpoke1']==idpoke1] and datapredict[datapredict['idpoke2']==idpoke2]:
-    #         predict=datapredict[datapredict['idpoke1']==idpoke1 and datapredict['idpoke2']==idpoke2]['predict']
-    #         proba=datapredict[datapredict['idpoke1']==idpoke1 and datapredict['idpoke2']==idpoke2]['proba']
-    #         if predict==0:
-    #             winner=poke1.title()
-    #         else:
-    #             winner=poke2.title()
-            
-    # except:
-    #     if datapredict[datapredict['idpoke1']==idpoke2] and datapredict[datapredict['idpoke2']==idpoke1]:
-    #         predict=datapredict[datapredict['idpoke1']==idpoke2 and datapredict['idpoke2']==idpoke1]['predict']
-    #         proba=datapredict[datapredict['idpoke1']==idpoke2 and datapredict['idpoke2']==idpoke1]['proba']
-    #         if predict==0:
-    #             winner=poke2.title()
-    #         else:
-    #             winner=poke1.title()
+    plt.figure(figsize=(20,7))
+    plt.subplot(161)
+    plt.bar(dfhp['nama'],dfhp['hp'],color=['b','g'],alpha=0.5)
+    plt.title('HP',fontsize=15)
+    plt.xticks(fontsize=15)
    
+    plt.subplot(162)
+    plt.bar(dfattack['nama'],dfattack['attack'],color=['b','g'],alpha=0.5)
+    plt.title('Attack',fontsize=15)
+    plt.xticks(fontsize=15)
 
-    return render_template('pokemon.html',nama1=poke1.title(),nama2=poke2.title(),gambar1=gambar1,gambar2=gambar2,winner=winner,proba=probamax)
+    plt.subplot(163)
+    plt.bar(dfdefense['nama'],dfdefense['defense'],color=['b','g'],alpha=0.5)
+    plt.title('Defense',fontsize=15)
+    plt.xticks(fontsize=15)
+    plt.subplot(164)
+    plt.bar(dfspatk['nama'],dfspatk['spatk'],color=['b','g'],alpha=0.5)
+    plt.title('Special Attack',fontsize=15)
+    plt.xticks(fontsize=15)
+    plt.subplot(165)
+    plt.bar(dfspdef['nama'],dfspdef['spdef'],color=['b','g'],alpha=0.5)
+    plt.title('Special Defense',fontsize=15)
+    plt.xticks(fontsize=15)
+    plt.subplot(166)
+    plt.bar(dfspeed['nama'],dfspeed['speed'],color=['b','g'],alpha=0.5)
+    plt.title('Speed',fontsize=15)
+    plt.xticks(fontsize=15)
+    plt.tight_layout()
 
-@app.route('/notFound')
+    addressplot='./storage/plot'+poke1+poke2+'.png'
+    urlplot='http://localhost:5000/fileupload/plot'+poke1+poke2+'.png'
+    plt.savefig(addressplot)
+    plot=urlplot
+    # namafile='plot.png'
+    # plt.savefig(os.path.join(app.config['UPLOAD_FOLDER'],namafile))
+    return render_template('pokemon.html',nama1=poke1.title(),nama2=poke2.title(),gambar1=gambar1,gambar2=gambar2,winner=winner,proba=probamax,plot=plot)
+
+@app.route('/fileupload/<path:x>')
+def hasilUpload(x):
+    return send_from_directory('storage',x)
+
+@app.route('/notfound')
 def notfound():
     return render_template('error.html')
 
 @app.errorhandler(404)
-def notFound404(x):
+def notFound404(error):
     return render_template('error.html')
 
 if __name__=='__main__':

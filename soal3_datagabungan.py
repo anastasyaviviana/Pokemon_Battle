@@ -1,8 +1,8 @@
 import pandas as pd
 
-dfpoke=pd.read_csv('pokemon.csv',index_col=0)
+dfpoke=pd.read_csv('./data/pokemon.csv',index_col=0)
 dfpoke=dfpoke[['Name','HP','Attack','Defense','Sp. Atk','Sp. Def','Speed']]
-dfcombats=pd.read_csv('combats.csv')
+dfcombats=pd.read_csv('./data/combats.csv')
 
 #df train gabungan 
 id1=[]
@@ -46,4 +46,4 @@ for i in range(len(dfcombats)):
         winner.append(win)        #yang menang poke 2
 
 df=pd.DataFrame(dict(idpoke1=id1,idpoke2=id2,hp1=hp1,hp2=hp2,attack1=attack1,attack2=attack2,defense1=defense1,defense2=defense2,spatk1=spatk1,spatk2=spatk2,spdef1=spdef1,spdef2=spdef2,speed1=speed1,speed2=speed2,winner=winner))
-df.to_csv('datatrain.csv')
+df.to_csv('./data/datatrain.csv')

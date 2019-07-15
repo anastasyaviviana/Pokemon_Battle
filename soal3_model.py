@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
-df=pd.read_csv('datatrain.csv')
+df=pd.read_csv('./data/datatrain.csv')
 
 var_x=df.drop(['Unnamed: 0','idpoke1','idpoke2','winner'],axis=1)
 print(var_x.columns.values)
@@ -11,6 +11,7 @@ var_y=df['winner']
 from sklearn.model_selection import train_test_split
 xtrain,xtest,ytrain,ytest=train_test_split(var_x,var_y,test_size=0.1)
 
+#Method=Logistic Regression
 model=LogisticRegression(solver='liblinear',multi_class='auto')
 model.fit(xtrain,ytrain)
 print(model.score(xtest,ytest))  #89,28%
